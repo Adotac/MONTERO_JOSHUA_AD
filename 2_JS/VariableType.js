@@ -4,7 +4,6 @@ var b = {one: 1, "two": "two", three: [3] };
 var c;
 var d = null;
 
-console.log(typeof number);
 console.log(`The variable ${b['one']} is of type ${typeof b}`);
 
 console.log(b);
@@ -15,3 +14,4 @@ console.log(b);
 b["five"] = ["HAHAHAHHA", "MEOW"];
 console.log(b);
 console.log(b.six); 
+
