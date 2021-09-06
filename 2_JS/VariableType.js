@@ -15,6 +15,3 @@ console.log(b);
 b["five"] = ["HAHAHAHHA", "MEOW"];
 console.log(b);
 console.log(b.six); 
-
-
-
