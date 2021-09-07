@@ -4,7 +4,7 @@ var primeflag = false;
 var factorsCtr = 0;
 for(var i = 1; i < num; i++){
     if(num % i == 0 && num != 1)
-        factorsCtr++;
+        factorsCtr++; //counts the number of factors the number have
 
     if(factorsCtr > 1)
         break;
