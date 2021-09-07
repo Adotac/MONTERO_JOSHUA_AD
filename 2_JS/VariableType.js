@@ -9,7 +9,7 @@ console.log(a);
 console.log(`The variable ${a} is of type ${typeof a}\n`);
 
 console.log(b);
-console.log(`The variable ${b} is of type ${typeof b}`);
+console.log(`The variable ${b} is of type ${typeof b}\n`);
 
 console.log(c); 
 console.log(`The variable ${c} is of type ${typeof c}\n`);
