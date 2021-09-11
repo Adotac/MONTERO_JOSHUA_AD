@@ -6,7 +6,7 @@ export class Exercise3Service {
         var randomSentence = [ "Hello World! " + name + " has been born!",
             "Hi there, " + name+"...", "Its not that I like "+name+" or something, or anything... bakaa!!","What are you doing here " + name + "?",
             "Which will you take " + name + ", red pill or blue pill?", "Don't worry "+name+" you're also someone's little pogchamp.",
-            "What did you eat today "+name+"?"];
+            "What did you eat today "+name+"?", "How was your day "+name+"?"];
 
         return randomSentence[Math.floor(Math.random()*randomSentence.length)];
     }
