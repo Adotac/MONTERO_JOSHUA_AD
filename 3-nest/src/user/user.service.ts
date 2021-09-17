@@ -54,9 +54,9 @@ export class UserService {
                 if(typeof b?.email === typeof toString() && 
                     typeof b?.password === typeof toString()){
                     
-                    console.log("PASDASDASDASDAS");
-                    if(eTemp.localeCompare(b?.email)==0 && pTemp.localeCompare(b?.password)==0){
-                        console.log("928374");
+                    //console.log("PASDASDASDASDAS");
+                    if(b?.email.localeCompare(eTemp)==0 && b?.password.localeCompare(eTemp)==0){
+                        //console.log("928374");
                         return {message: "Login success!"};
                         
                     }
