@@ -27,18 +27,35 @@ export class UserService {
     }
 
     searchTerm(term:string){
-        
+        try{
+            for(const [key, u] of this.users.entries()){
+                if(term.toLocaleUpperCase().localeCompare(u.name.toLocaleUpperCase())==0 ||
+                term.toLocaleUpperCase().localeCompare(u.email.toLocaleUpperCase())==0 ||
+                term.toLocaleUpperCase().localeCompare(u.id.toLocaleUpperCase())==0||
+                term.toLocaleUpperCase().localeCompare(u.age.toLocaleString())==0) {
+    
+                    return u.toJson();
+                }
+            }
+        }catch(e){
+            console.error(e);
+            return {status:false, error:e.toString()};
+        }
+
+        return false;
     }
 
     loginUser(b:any){
+        var eTemp, pTemp;
         try{
             for(const u of this.users.values()){
-                
+                eTemp = u.email; pTemp = u.password;
+
                 if(typeof b?.email === typeof toString() && 
                     typeof b?.password === typeof toString()){
                     
                     console.log("PASDASDASDASDAS");
-                    if(u.email === b.email && u.password === b.password){
+                    if(eTemp.localeCompare(b?.email)==0 && pTemp.localeCompare(b?.password)==0){
                         console.log("928374");
                         return {message: "Login success!"};
                         
