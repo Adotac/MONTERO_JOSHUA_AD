@@ -17,43 +17,37 @@ export class UserController {
     }
 
     @Post("/register")
-    goRegister(@Body() body: any): boolean{      
-        try {
-            return this.userService.register(body);
-        } catch (e) {
-            console.log(e); return false; 
-        }  
-        
+    goRegister(@Body() body: any){      
+        return this.userService.register(body);
     }
 
     @Get("/:id")
-    getID(){
-        return this.userService.getAll();
+    getID(@Param('id')id:string){
+        return this.userService.getUser(id);
     }
 
     @Put("/:id")
-    setID(){
-        return this.userService.getAll();
+    putD(@Body() body: any, @Param('id')id:string){
+        return this.userService.putData(id, body);
     }
 
     @Patch("/:id")
-    modifyID(){
-        return this.userService.getAll();
+    patchD(@Param('id')id:string, @Body() body: any){
+        return this.userService.patchData(id, body);
     }
 
     @Delete("/:id")
-    deleteID(){
-        return this.userService.getAll();
+    deleteID(@Param('id')id:string){
+        return this.userService.deleteUser(id);
     }
 
     @Post("/login")
-    login(){
-        return this.userService.getAll();
+    login(@Body() body: any){
+        return this.userService.loginUser(body);
     }
 
     @Get("/search/:term")
-    search(@Param('term')term:string): string{
-
-        return "";
+    search(@Param('term')term:string){
+        return this.userService.searchTerm(term);
     }
 }
