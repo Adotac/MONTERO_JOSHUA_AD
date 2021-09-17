@@ -5,35 +5,35 @@ import { UserService } from './user.service';
 export class UserController {
     constructor(private readonly userService:UserService){}
 
-    @Get("/")
-    mstate(){
-        this.userService.populate();
-        return this.userService.getAll();
-    }
-
-    @Get("/all") // return all users
-    getAll(){
-        return this.userService.getAll();
-    }
 
     @Post("/register")
     goRegister(@Body() body: any){      
         return this.userService.register(body);
     }
 
+    @Get("/all") // return all users
+    getAll(){
+        return this.userService.getAllUsers();
+    }
+
     @Get("/:id")
-    getID(@Param('id')id:string){
-        return this.userService.getUser(id);
+    retrieveUser(@Param('id')id:string){
+        return this.userService.getUser(id); 
+    }
+
+    @Get("/search/:term")
+    search(@Param('term')term:string){
+        return this.userService.searchUser(term);
     }
 
     @Put("/:id")
     putD(@Body() body: any, @Param('id')id:string){
-        return this.userService.putData(id, body);
+        return this.userService.replacePut(body, id);
     }
 
     @Patch("/:id")
     patchD(@Param('id')id:string, @Body() body: any){
-        return this.userService.patchData(id, body);
+        return this.userService.replacePatch(body, id);
     }
 
     @Delete("/:id")
@@ -44,10 +44,8 @@ export class UserController {
     @Post("/login")
     login(@Body() body: any){
         return this.userService.loginUser(body);
+        return false;
     }
 
-    @Get("/search/:term")
-    search(@Param('term')term:string){
-        return this.userService.searchTerm(term);
-    }
+    
 }
