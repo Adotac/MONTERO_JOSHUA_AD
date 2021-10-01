@@ -33,9 +33,9 @@ export class User {
       if(`${key}` === prop) {
         //console.log("------------------------------------------" + `${this[key]}`);
         if(typeof(key) === 'number')
-          return parseInt(key);
+          return parseInt(this[key]);
         else
-          return key;
+          return `${this[key]}`;
       }
     }
   }

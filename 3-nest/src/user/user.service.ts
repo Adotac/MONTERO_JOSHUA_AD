@@ -114,7 +114,8 @@ export class UserService {
 
                     for(const key of this.users.values()){
                         if(key.matches(id)){
-                            if(this.emailExists(u.email) ){
+                            if(this.emailExists(u.email) && !key.matches(u.email) ){
+                                //console.log(key.getProp('email') + "++++++++++++++");
                                 throw new Error(`${u.email} is already in use!`); 
                             }
                             else{ 
@@ -151,7 +152,7 @@ export class UserService {
                     
                     for(const key of this.users.values()){
                         if(key.matches(id)){
-                            if(this.emailExists(u.email) ){
+                            if(this.emailExists(u.email) && !key.matches(u.email) ){
                                 throw new Error(`${u.email} is already in use!`); 
                             }
                             else{ 
