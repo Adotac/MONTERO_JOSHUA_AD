@@ -27,6 +27,19 @@ export class User {
     }
   }
 
+  getProp(prop: string): any{
+    var keys: Array<string> = Helper.describeClass(User);
+    for(const key of keys){
+      if(`${key}` === prop) {
+        //console.log("------------------------------------------" + `${this[key]}`);
+        if(typeof(key) === 'number')
+          return parseInt(key);
+        else
+          return key;
+      }
+    }
+  }
+
   matches(term: string): boolean {
     var keys: Array<string> = Helper.describeClass(User);
     keys = Helper.removeItemOnce(keys, 'password');
