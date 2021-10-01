@@ -27,19 +27,6 @@ export class User {
     }
   }
 
-  getProp(prop: string): any{
-    var keys: Array<string> = Helper.describeClass(User);
-    for(const key of keys){
-      if(`${key}` === prop) {
-        //console.log("------------------------------------------" + `${this[key]}`);
-        if(typeof(key) === 'number')
-          return parseInt(this[key]);
-        else
-          return `${this[key]}`;
-      }
-    }
-  }
-
   matches(term: string): boolean {
     var keys: Array<string> = Helper.describeClass(User);
     keys = Helper.removeItemOnce(keys, 'password');
@@ -57,6 +44,7 @@ export class User {
       for(const key of Object.keys(body)){
         if(keys.includes(`${key}`)) {
           eval('this.'+`${key}` + ' = ' + 'body.'+`${key}`);
+          //this[key] = body[key];
         }
       }
       return true;
@@ -72,11 +60,21 @@ export class User {
   }
 
   toJson() {    
-
-    return {id: this.id, 
+    return {
+      //id: this.id, 
       name: this.name,
       age: this.age,
       email: this.email
+      };
+
+  }
+  toJsonFB() {    
+    return {
+      //id: this.id, 
+      name: this.name,
+      age: this.age,
+      email: this.email,
+      password: this.password
       };
 
   }

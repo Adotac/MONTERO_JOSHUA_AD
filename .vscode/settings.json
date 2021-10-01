@@ -1,0 +1,4 @@
+{
+    "rpc.enabled": true,
+    "rpc.appName": "Visual Studio Code"
+}
