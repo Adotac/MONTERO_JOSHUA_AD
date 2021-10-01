@@ -111,14 +111,10 @@ export class UserService {
                 if(validBodyPut.valid){
                     if(u.hasOwnProperty('id')) { 
                         throw new Error('Cannot replace the generated id'); }
-                    
-                    // if( !(this.getUser(id).data['email'] === u['email']) ){ //for a case where an id tries to replace its own email with the same email
-                    //     if(this.emailExists(u.email)){
-                    //         throw new Error(`${u.email} is already in use by another user!`); }    
-                    // }
+
                     for(const key of this.users.values()){
                         if(key.matches(id)){
-                            if(this.emailExists(u.email)){
+                            if(this.emailExists(u.email) ){
                                 throw new Error(`${u.email} is already in use!`); 
                             }
                             else{ 
@@ -139,7 +135,7 @@ export class UserService {
         catch(e){
             //console.log(e.message);
             console.log(e.message + "\n");
-            this.logAllUsers();
+            //this.logAllUsers();
             return {success: false, data: `Error adding document, ${e.message}`};
         }
 
@@ -153,13 +149,9 @@ export class UserService {
                     if(u.hasOwnProperty('id')) { 
                         throw new Error('Cannot replace the generated id'); }
                     
-                    // if( !(this.getUser(id).data['email'] === u['email']) ){ //for a case where an id tries to replace its own email with the same email
-                    //     if(this.emailExists(u.email)){
-                    //         throw new Error(`${u.email} is already in use by another user!`); }    
-                    // }
                     for(const key of this.users.values()){
                         if(key.matches(id)){
-                            if(this.emailExists(u.email)){
+                            if(this.emailExists(u.email) ){
                                 throw new Error(`${u.email} is already in use!`); 
                             }
                             else{ 
@@ -179,7 +171,7 @@ export class UserService {
         }
         catch(e){
             console.log(e.message + "\n");
-            this.logAllUsers();
+            //this.logAllUsers();
             return {success: false, data: `Error adding document, ${e.message}`};
         }
     }
