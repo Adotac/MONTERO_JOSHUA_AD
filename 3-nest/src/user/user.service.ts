@@ -1,188 +1,207 @@
-import { Body, Injectable } from '@nestjs/common';
-import { User } from './user.model';
+import { CRUDReturn } from './user.resource/crud_return.interface';
+import { Helper } from './user.resource/helper';
+
+import { Injectable } from '@nestjs/common';
+import { User } from './user.resource/user.model';
 
 @Injectable()
 export class UserService {
-    private genKey: string = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
     private users: Map<string,User> = new Map<string,User>();
+    email: string;
+    password: string;
 
     constructor(){
-        this.populate();
+        this.users = Helper.populate(); 
     }
 
-    getAll(){
-       var populatedData = [];
-       for(const user of this.users.values()){
-           populatedData.push(user.toJson());
-
-       }
-       return populatedData;
-    }
-
-    populate(){
-        this.users.set("100",new User("100","James",18,"james@email.com","123456"));
-        this.users.set("101",new User("101","John",18,"john@email.com","143441"));
-        this.users.set("102",new User("102","Luke",18,"luke@email.com","654321"));
-        this.users.set("103",new User("103","Judas",13,"judas@email.com","696969"));
-    }
-
-    searchTerm(term:string){
-        try{
-            for(const [key, u] of this.users.entries()){
-                if(term.toLocaleUpperCase().localeCompare(u.name.toLocaleUpperCase())==0 ||
-                term.toLocaleUpperCase().localeCompare(u.email.toLocaleUpperCase())==0 ||
-                term.toLocaleUpperCase().localeCompare(u.id.toLocaleUpperCase())==0||
-                term.toLocaleUpperCase().localeCompare(u.age.toLocaleString())==0) {
-    
-                    return u.toJson();
-                }
-            }
-        }catch(e){
-            console.error(e);
-            return {status:false, error:e.toString()};
-        }
-
-        return false;
-    }
-
-    loginUser(b:any){
-        var eTemp, pTemp;
-        try{
-            for(const u of this.users.values()){
-                eTemp = u.email; pTemp = u.password;
-
-                if(typeof b?.email === typeof toString() && 
-                    typeof b?.password === typeof toString()){
-                    
-                    //console.log("PASDASDASDASDAS");
-                    if(b?.email.localeCompare(eTemp)==0 && b?.password.localeCompare(eTemp)==0){
-                        //console.log("928374");
-                        return {message: "Login success!"};
-                        
-                    }
-                }
-
-                //console.log(b.email); console.log(u.email);
-            }
-            throw new Error('Login failed!');
-        }catch(e){
-            console.error(e);
-            return {status:false, error:e.toString()};
-        }
-    }
-
-    deleteUser(id:string){
-        try{
-            for(const [key, u] of this.users.entries()){
-                if(id.localeCompare(key)==0){
-                    this.users.delete(key);
-                    return {message: "success!"};
-                }
-            }
-            throw new Error('User doesn\'t exist!');
-        }catch(e){
-            console.error(e);
-            return {status:false, error:e.toString()};
-        }
-    }
-
-    putData(id:string, b:any){
-        for(const [key, u] of this.users.entries()){
-            if(id.localeCompare(key)==0){
-                u.name = b?.name;
-                u.age = b?.age;
-                u.email = b?.email;
-                u.password = b?.password;
-
-                if(b.hasOwnProperty('name') && b.hasOwnProperty('age') &&
-                b.hasOwnProperty('email') && b.hasOwnProperty('password') )
-                    return true;
-
-                break;
-            }
-        }
-
-        return false;
-    }
-
-    patchData(id:string, b:any){
-        var flag = true;
-        for(const [key, u] of this.users.entries()){
-            if(id.localeCompare(key)==0){
-                try{
-                    if(b.hasOwnProperty('name')){
-                        if( typeof b?.name === typeof toString() )
-                            u.name = b?.name;
-                        else throw new Error('The name is invalid');
-                        
-                    }
-                    if(b.hasOwnProperty('age')){
-                        if( typeof b?.age === typeof 0)                           
-                            u.age = b?.age;
-                        else throw new Error('The age is invalid');
-                        
-                    }
-                    if(b.hasOwnProperty('email')){
-                        if(typeof b?.email === typeof toString())
-                            u.email = b?.email;
-                        else throw new Error('The email is invalid');
-
-                    }
-                    if(b.hasOwnProperty('password')){
-                        if(typeof b?.password === typeof toString())
-                            u.password = b?.password;
-                        else throw new Error('The password is invalid');
-                    }
-
-                    return true;
-                }catch(e){
-                    console.error(e);
-                    return {status:false, error:e.toString()};
-                }
-            }
-        }
-    }
-
-    getUser(id:string){
-        for(const [key, u] of this.users.entries()){
-            if(id.localeCompare(key)==0)
-                return u.toJson();
-        }
-        return false;
-    }
-
-    register(u:any){
+    register(u:any): CRUDReturn{
         //console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
         var newUser: User;
         try{
-            newUser = new User(u?.id, u?.name, u?.age, u?.email, u?.password);
-            if(newUser.id === null || newUser.id === "")
-                newUser.id = this.generateID(this.users);
-        }catch(e){
-            console.log(e);
-            return false;
-        };
-
-        this.users.set(newUser.id, newUser);
-        return true
-    }
-
-    private generateID(users: Map<string,User> ): string{
-        var MAX = 5;
-        var tempID = "";
-        for(var i = 0; i < MAX; i++){
-            tempID += this.genKey[Math.floor(Math.random()*this.genKey.length)];
-
-            if(i == MAX-1){
-                for(const user of users.values() ){
-                    if(tempID.localeCompare(user.id)==0){
-                        i = 0; //reset
-                        tempID = "";
+            var validBodyPut: { valid: boolean; data: string } = Helper.validBodyPut(u);   
+            if(validBodyPut.valid){
+                if(!this.emailExists(u.email)){
+                    var newUser: User = new User(
+                        u.name,
+                        u.age,
+                        u.email,
+                        u.password
+                    );
+                    if(this.saveToDB(newUser)){
+                        return {
+                            success: true,
+                            data: newUser.toJson()
+                        };
+                    }
+                    else{
+                        throw new Error('generic database error');
                     }
                 }
+                else{
+                    throw new Error(`${u.email} is already in use by another user!`);
+                }
             }
+            else{
+                throw new Error(validBodyPut.data);
+            }
+            
+        }catch(e){
+            console.log(e.message);
+            return {success: false, data: `Error adding document, ${e.message}`};
         }
-        return tempID;
     }
 
+    emailExists(email: string): boolean{
+        try{
+            for(const u of this.users.values()){
+                if(u.matches(email))
+                    return true;
+            }
+        }
+        catch(error){
+            console.log(error);
+        }
+        return false;
+    }
+
+    saveToDB(user: User): boolean{
+        try{
+            this.users.set(user.id, user);
+            return this.users.has(user.id);
+        }
+        catch(error){
+            console.log(error);
+            return false;
+        }
+    }
+
+    getAllUsers(): CRUDReturn{
+        var results: Array<any> = [];
+        for(const u of this.users.values()){
+            results.push(u.toJson());
+        }
+        return { success: results.length > 0, data: results};
+    }
+
+    logAllUsers(){ console.log(this.getAllUsers()); }
+
+    getUser(id: string): CRUDReturn{
+        if(this.users.has(id)){
+            return {success: true, data: this.users.get(id).toJson()};
+        }
+        else{
+            return{success: false, data: `User ${id} is not in the database.`};
+        }
+
+    }
+
+    searchUser(term: string): CRUDReturn{
+        var results: Array<any> = [];
+        for(const u of this.users.values()){
+            if(u.matches(term))
+                results.push(u.toJson());
+        }
+        return { success: results.length > 0, data: results};
+    }
+
+    replacePut(u: any, id: string): CRUDReturn{
+        try{
+            if(this.users.has(id)){
+                var validBodyPut: { valid: boolean; data: string } = Helper.validBodyPut(u);
+                if(validBodyPut.valid){
+                    if(u.hasOwnProperty('id')) { 
+                        throw new Error('Cannot replace the generated id'); }
+                    
+                    if( !(this.getUser(id).data['email'] === u['email']) ){ //for a case where an id tries to replace its own email with the same email
+                        if(this.emailExists(u.email)){
+                            throw new Error(`${u.email} is already in use by another user!`); }    
+                    }
+                    for(const key of this.users.values()){
+                        if(key.matches(id)){
+                            return {success: key.replaceValues(u), data: key.toJson()};
+                        }
+                    }
+                }
+                else{
+                    throw new Error(validBodyPut.data);
+                }
+            }
+            else{
+                return{success: false, data: `User ${id} is not in the database.`};
+            }
+            
+        }
+        catch(e){
+            console.log(e.message);
+            return {success: false, data: `Error adding document, ${e.message}`};
+        }
+
+    }
+
+    replacePatch(u: any, id: string): CRUDReturn{
+        try{
+            if(this.users.has(id)){
+                var validBody: { valid: boolean; data: string } = Helper.validBody(u);
+                if(validBody.valid){
+                    if(u.hasOwnProperty('id')) { 
+                        throw new Error('Cannot replace the generated id'); }
+                    
+                    if( !(this.getUser(id).data['email'] === u['email']) ){ //for a case where an id tries to replace its own email with the same email
+                        if(this.emailExists(u.email)){
+                            throw new Error(`${u.email} is already in use by another user!`); }    
+                    }
+
+                    
+                    for(const key of this.users.values()){
+                        if(key.matches(id))
+                            return {success: key.replaceValues(u), data: key.toJson()};
+                    }
+                }
+                else{
+                    throw new Error(validBody.data);
+                }
+            }
+            else{
+                return{success: false, data: `User ${id} is not in the database.`};
+            }
+            
+        }
+        catch(e){
+            console.log(e.message + "\n");
+            this.logAllUsers();
+            return {success: false, data: `Error adding document, ${e.message}`};
+        }
+    }
+
+    deleteUser(id: string): CRUDReturn{
+        if(this.users.has(id)){
+            return {
+                success: this.users.delete(id),
+                data: `User ${id} has been successfully deleted`
+            };
+        }
+        else{
+            return {
+                success: false,
+                data: `User ${id} doesn't exist in database`
+            };
+        }
+    }
+
+    loginUser(u: any): CRUDReturn{
+        try{
+            for(const key of this.users.values()){
+                if(key.matches(u.email)){
+                    return key.login(u.password);
+                }                  
+            }
+            throw new Error(`${u.email} doesn't exist!`);
+        }
+        catch(e){
+            console.log(e.message);
+            return {success: false, data: `${e.message}`};
+        }
+
+    }
+    
 }
