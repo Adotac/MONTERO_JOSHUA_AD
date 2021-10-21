@@ -1,0 +1,87 @@
+.b {
+    height: 100vh;
+    width: 100vw;
+    margin: 0px;
+    padding: 0px;
+    display: grid;
+    background-image: url("../../../assets/stunning\ suisei.jpg");
+    background-origin: border-box;
+    justify-content: center;
+    align-content: center;
+    .bgbox {
+        position: absolute;
+        overflow: hidden;
+        display: block;
+        height: 100%;
+        width: 100%;
+        padding: 0;
+        filter: blur(2px);
+    }
+}
+
+.login {
+    display: flex;
+    height: 640px;
+    width: 900px;
+    box-shadow: 5px 10px 30px 3px;
+    margin: 0px;
+    overflow: hidden;
+    z-index: 3;
+    flex-direction: column;
+    background-image: url("../../../assets/stunning\ suisei.jpg");
+    background-size: cover;
+    background-position-x: 180%;
+    .loginForm {
+        background-color: white;
+        display: flex;
+        flex-direction: column;
+        margin-left: 50%;
+        padding: 0% 5% 0% 5%;
+        height: inherit;
+        .loginHeader {
+            margin-top: 50px;
+            margin-bottom: 25%;
+            font-family: 'Rubik', sans-serif;
+            font-size: 52px;
+            letter-spacing: 2.5px;
+            color: #00aeef;
+            width: 100%;
+        }
+        .btnLogin {
+            text-align: center;
+            height: 45px;
+            width: 100%;
+            margin-top: 50px;
+            padding-top: 0px;
+        }
+        .btnRegister {
+            margin-top: 15px;
+            background: none;
+            border: none;
+            height: 60px;
+            width: 100%;
+            color: #00aeef;
+            font-size: 16px;
+        }
+        .btnRegister:hover {
+            color: rgb(70, 150, 241);
+            cursor: grab;
+        }
+        input {
+            font-family: 'Azaret Mono';
+            font-size: 16px;
+            display: inline-block;
+            height: 40px;
+            width: 100%;
+            margin-top: 0px;
+        }
+        label {
+            font-family: 'Poppins', sans-serif;
+            display: inline-block;
+            height: 20px;
+            width: 100%;
+            padding-top: 25px;
+            color: #00aeef
+        }
+    }
+}

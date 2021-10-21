@@ -1,0 +1,70 @@
+.b {
+    height: 100vh;
+    width: 100vw;
+    margin: 0px;
+    padding: 0px;
+    display: grid;
+    background-image: url("../../../assets/stunning\ suisei.jpg");
+    background-origin: border-box;
+    justify-content: center;
+    align-content: center;
+    .bgbox {
+        position: absolute;
+        overflow: hidden;
+        display: block;
+        height: 100%;
+        width: 100%;
+        padding: 0;
+        filter: blur(2px);
+    }
+}
+
+.register {
+    display: flex;
+    height: 640px;
+    width: 900px;
+    box-shadow: 5px 10px 30px 3px;
+    margin: 0px;
+    overflow: hidden;
+    z-index: 3;
+    flex-direction: column;
+    background-image: url("../../../assets/stunning\ suisei.jpg");
+    background-size: cover;
+    background-position-x: 180%;
+    .regForm {
+        background-color: white;
+        display: grid;
+        row-gap: 0px;
+        margin-left: 50%;
+        padding: 0% 5% 0% 5%;
+        height: inherit;
+        .regHeader {
+            margin-top: 10px;
+            font-family: 'Rubik', sans-serif;
+            font-size: 48px;
+            letter-spacing: 2.5px;
+            color: #00aeef;
+            width: 100%;
+        }
+        input {
+            font-family: 'Azaret Mono';
+            font-size: 16px;
+            height: 30px;
+            width: 100%;
+            margin-top: 0px;
+        }
+        label {
+            font-family: 'Poppins', sans-serif;
+            height: 20px;
+            width: 89%;
+            color: #00aeef
+        }
+        .btn {
+            text-align: center;
+            height: 40px;
+            width: 100%;
+            margin-top: 20px;
+            padding-top: 0px;
+        }
+    }
+}

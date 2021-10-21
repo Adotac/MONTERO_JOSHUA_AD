@@ -1,387 +1,327 @@
-import { CRUDReturn } from './user.resource/crud_return.interface';
-import { Helper } from './user.resource/helper';
+import * as admin from "firebase-admin";
 
-import { Injectable } from '@nestjs/common';
-import { User } from './user.resource/user.model';
+import { CRUDReturn } from "./user.resource/crud_return.interface";
+import { Helper } from "./user.resource/helper";
+import { Injectable } from "@nestjs/common";
+import { User } from "./user.resource/user.model";
 
-import * as admin from 'firebase-admin';
-
+const DEBUG: boolean = true;
 @Injectable()
 export class UserService {
-    private users: Map<string,User> = new Map<string,User>();
-    private firestore = admin.firestore();
+  private DB = admin.firestore();
+  constructor() {}
 
-    constructor(){
-        this.users = Helper.populate(); 
-        this.populateFB_DB();
-    }
-
-    async populateFB_DB(){
-
-        try{
-            for (const u of this.users.values()) {
-                console.log(`${u["email"]} processing!`);
-
-                var emailFlag = await this.emailExists(u["email"]);
-                    if(!emailFlag){
-                        var sdb = await this.saveToDB(u);
-                        if(sdb){
-                            console.log(`${u["email"]} has been added!`);
-                        }
-                        else{
-                            throw new Error('generic database error');
-                        }
-                    }
-                    else{
-                        console.log(`${u["email"]} is already in use by another user!`);
-                    }
-            }
-        }
-        catch(e){
-            console.log(e.message);
-            return {success: false, data: `Error adding populate document, ${e.message}`};
-        }
-    }
-
-    async register(u:any): Promise<CRUDReturn>{
-        //console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        var newUser: User;
-        try{
-            var validBodyPut: { valid: boolean; data: string } = Helper.validBodyPut(u);   
-            if(validBodyPut.valid){
-                //console.log(!this.emailExists(u.email));
-                const emailFlag = await this.emailExists(u.email);
-                if(!emailFlag){
-                    var newUser: User = new User(
-                        u.name,
-                        u.age,
-                        u.email,
-                        u.password
-                    );
-                    //console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-                    if(this.saveToDB(newUser)){
-                        return {
-                            success: true,
-                            data: newUser.toJson()
-                        };
-                    }
-                    else{
-                        throw new Error('generic database error');
-                    }
-                }
-                else{
-                    throw new Error(`${u.email} is already in use by another user!`);
-                }
-            }
-            else{
-                throw new Error(validBodyPut.data);
-            }
-            
-        }catch(e){
-            console.log(e.message);
-            return {success: false, data: `Error adding document, ${e.message}`};
-        }
-    }
-
-    async emailExists(email: string, options?: {exceptionId: string}): Promise<boolean>{
-        try{
-            var userResults = 
-            await this.firestore.collection("users")
-            .where("email", "==", email)
-            .get();
-
-            console.log("Result empty: " + userResults.empty);
-            if(userResults.empty){
-                //console.log("GFFFFFFFF");
-                return false;}
-
-            for(const u of userResults.docs){
-                console.log(u.data() +
-                            "\nOption defined: "+ options!=undefined);
-                if(options != undefined){
-                    if(u.id == options?.exceptionId) continue;
-                }
-                if(u.data()['email'] === email){
-                    return true;
-                }
-                else{
-                    return false;
-                }                
-            }
-            return false;
-        }
-        catch(error){
-            console.log("Email exists subfunction error\n" + error.message);
-            return false;
-        }
-    }
-
-    async saveToDB(user: User): Promise<boolean>{
-        try{
-            const ref = this.firestore.collection("users").doc(user.id);
-            await ref.set(user.toJsonFB());
-            //console.log("\N\NSAVED TO SDBBBBB!!!\N\N");
-            this.users.set(user.id, user);
-            //return (await ref.doc(user.id).get()).exists && this.users.has(user.id);
-            return (await ref.get()).exists;
-
-        }
-        catch(error){
-            console.log(error);
-            return false;
-        }
-    }
-
-    async getAllUsers(): Promise<CRUDReturn>{
-        var results: Array<any> = [];
-        try {
-            var dbData:FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData> 
-            = await this.firestore.collection("users").get();
-
-            dbData.forEach((doc)=>{
-                if(doc.exists){
-                    results.push({
-                        id: doc.id, 
-                        name: doc.data()['name'], 
-                        age: doc.data()['age'],
-                        email: doc.data()['email']
-                    });
-                }
-                //console.log(doc.data());
-            });
-
-
-            // for (const user of this.users.values()) {
-            //     results.push(user.toJson());
-            // }
-
-            return { success: true, data: results };
-        } catch (e) {
-            return { success: false, data: e };
-        }
-    }
-
-    logAllUsers(){ console.log(this.getAllUsers()); }
-
-    async getUser(id: string): Promise<CRUDReturn>{
-        var tempUser:User;
-        try{
-            var dbData:FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData> 
-            = await this.firestore.collection("users").get();
-
-            dbData.forEach((doc)=>{
-                if(doc.exists){
-                    tempUser = new User(
-                                doc.data()['name'],
-                                doc.data()['age'],
-                                doc.data()['email'],
-                                doc.data()['password'] );
-                    
-                    if(doc.id === id){
-                        throw 'Break';
-                    }
-                }
-                
-            });
-            return{success: false, data: `User ${id} is not in the database.`}
-        }catch(e){
-            if(e === 'Break'){
-                return {success: true, data: tempUser.toJson()};
-            }
-            console.log(e);
-            return {success: false, data: `Error adding document, ${e.message}`};
-        }
-
-    }
-
-    async searchUser(term: string): Promise<CRUDReturn>{
-        var results: Array<any> = [];
-
-        var dbData:FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData> 
-            = await this.firestore.collection("users").get();
-
-        dbData.forEach((doc)=>{
-            if(doc.exists){
-                var tempUser:User = new User(
-                                    doc.data()['name'],
-                                    doc.data()['age'],
-                                    doc.data()['email'],
-                                    doc.data()['password'] );
-                if(tempUser.matches(term)){
-                    results.push(tempUser.toJson());
-                }
-            }
-            
-        });
-        // for(const u of this.users.values()){
-        //     if(u.matches(term))
-        //         results.push(u.toJson());
-        // }
-        return { success: results.length > 0, data: results};
-    }
-
-    async replacePut(u: any, id: string): Promise<CRUDReturn>{
-        try{
-            const dbData = this.firestore.collection("users").doc(id);
-            const ddoc = await dbData.get();
-            var tempUser:User = new User(
-                                ddoc?.data()['name'],
-                                ddoc?.data()['age'],
-                                ddoc?.data()['email'],
-                                ddoc?.data()['password']); 
-
-            if(ddoc.exists){
-                console.log(ddoc.data() + "\n++++++++++++++");     
-                var validBodyPut: { valid: boolean; data: string } = Helper.validBodyPut(u);
-                if(validBodyPut.valid){
-                    if(u.hasOwnProperty('id')) { 
-                        throw new Error('Cannot replace the generated id'); }
-
-                    var emailFlag = await this.emailExists(u.email);
-                    if( emailFlag  && !tempUser.matches(u.email)){
-                        //console.log(key.getProp('email') + "++++++++++++++");
-                        throw new Error(`${u.email} is already in use!`); 
-                    }
-                    else{ 
-                        if(tempUser.replaceValues(u)){
-                            const res = await dbData.update(tempUser.toJsonFB());
-                            return {success: true, data: tempUser.toJson()};
-                        }
-                        else{
-                            return {success: false, data: tempUser.toJson()};
-                        }
-                    }
-                                      
-                }
-                else{
-                    throw new Error(validBodyPut.data);
-                }
-            }
-            else{
-                return{success: false, data: `User ${id} is not in the database.`};
-            }
-            
-        }
-        catch(e){
-            //console.log(e.message);
-            console.log(e.message + "\n");
-            //this.logAllUsers();
-            return {success: false, data: `Error adding document, ${e.message}`};
-        }
-
-    }
-
-    async replacePatch(u: any, id: string): Promise<CRUDReturn>{
-        try{
-            const dbData = this.firestore.collection("users").doc(id);
-            const ddoc = await dbData.get();
-            var tempUser:User = new User(
-                                ddoc?.data()['name'],
-                                ddoc?.data()['age'],
-                                ddoc?.data()['email'],
-                                ddoc?.data()['password']); 
-
-            if(ddoc.exists){
-                var validBody: { valid: boolean; data: string } = Helper.validBody(u);
-                if(validBody.valid){
-                    if(u.hasOwnProperty('id')) { 
-                        throw new Error('Cannot replace the generated id'); }
-                    
-                    
-                    var emailFlag = await this.emailExists(u.email);
-                    if( emailFlag  && !tempUser.matches(u.email)){
-                        //console.log(key.getProp('email') + "++++++++++++++");
-                        throw new Error(`${u.email} is already in use!`); 
-                    }
-                    else{ 
-                        if(tempUser.replaceValues(u)){
-                            const res = await dbData.update(tempUser.toJsonFB());
-                            return {success: true, data: tempUser.toJson()};
-                        }
-                        else{
-                            return {success: false, data: tempUser.toJson()};
-                        }
-                    }              
-                }
-                else{
-                    throw new Error(validBody.data);
-                }
-            }
-            else{
-                return{success: false, data: `User ${id} is not in the database.`};
-            }
-            
-        }
-        catch(e){
-            console.log(e.message + "\n");
-            //this.logAllUsers();
-            return {success: false, data: `Error adding document, ${e.message}`};
-        }
-    }
-
-    async deleteUser(id: string): Promise<CRUDReturn>{
-        const dbData = this.firestore.collection("users").doc(id);
-        const ddoc = await dbData.get();
-        try{
-            if(ddoc.exists){
-                dbData.delete().then(()=>{
-                    return {
-                        success: true,
-                        data: `User ${id} has been successfully deleted`
-                    };
-                });
-                
-            }
-            else{
-                return {
-                    success: false,
-                    data: `User ${id} doesn't exist in database`
-                };
-            }
-        }
-        catch(e){
-            console.log(e.message + "\n");
-            //this.logAllUsers();
-            return {success: false, data: `Error adding document, ${e.message}`};
-        }
+  async resetDatabase(): Promise<boolean> {
+    try {
+        console.log("RESETTING...");
+        var currentDbState =
+        await this.DB.collection("users").get();
         
-    }
-
-    async loginUser(u: any): Promise<CRUDReturn>{
-        var tempUser:User;
-        try{    
-            var dbData:FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData> 
-            = await this.firestore.collection("users").get();
-
-            dbData.forEach((doc)=>{
-                if(doc.exists){
-                    tempUser = new User(
-                                doc.data()['name'],
-                                doc.data()['age'],
-                                doc.data()['email'],
-                                doc.data()['password'] );
-                    
-                    if(tempUser.matches(u.email)){
-                        throw 'Break';
-                    }
-                }
-                
-            });
-
-            // if(tempUser.matches(u.email)){
-            //     return tempUser.login(u.password);
-            // }                  
-
-            throw new Error(`${u.email} doesn't exist!`);
-        }
-        catch(e){
-            if(e === 'Break'){
-                return tempUser.login(u.password);
+        if (currentDbState.empty){
+            for (const user of Helper.populate().values()) {
+                this.saveToDB(user);
             }
-            console.log(e.message);
-            return {success: false, data: `${e.message}`};
+            return true;
         }
-
+        else {
+            console.log("DELETING EXISTING DATA...");
+            var batchOps: Array<Promise<any>> = [];
+            for (const doc of currentDbState.docs) {
+                batchOps.push(doc.ref.delete());
+            }
+            //running all delete in one go;
+            await Promise.all(batchOps);
+            for (const user of Helper.populate().values()) {
+                batchOps.push(this.saveToDB(user));
+            }
+            await Promise.all(batchOps);
+            return true;
+        }
+    } catch (e) {
+        console.log(e);
+        return false;
     }
-    
+  }
+
+  async register(body: any): Promise<CRUDReturn> {
+    try {
+      var validBody: { valid: boolean; data: string } =
+        Helper.validBodyPut(body);
+      if (validBody.valid) {
+        var exists = await this.emailExists(body.email);
+        console.log(`Does ${body.email} exist in db? ${exists}`);
+        if (!exists) {
+          var newUser: User = new User(
+            body.name,
+            body.age,
+            body.email,
+            body.password
+          );
+          if (await this.saveToDB(newUser)) {
+            // if (DEBUG) await this.logAllUsers();
+            return {
+              success: true,
+              data: newUser.toJson(),
+            };
+          } else {
+            throw new Error("generic database error");
+          }
+        } else
+          throw new Error(`${body.email} is already in use by another user!`);
+      } else {
+        throw new Error(validBody.data);
+      }
+    } catch (error) {
+      console.log("RegisterError");
+      console.log(error.message);
+      return { success: false, data: `Error adding account, ${error}` };
+    }
+  }
+
+  async getOne(id: string): Promise<CRUDReturn> {
+    try {
+        
+      var result = await this.DB.collection("users").doc(id).get();
+      if (result.exists) {
+        return {
+          success: true,
+          data: result.data(),
+        };
+      } else {
+        return {
+          success: false,
+          data: `User ${id} does not exist in database!`,
+        };
+      }
+    } catch (error) {
+      console.log("Get one error");
+      console.log(error.message);
+      return {
+        success: false,
+        data: error.message,
+      };
+    }
+  }
+
+  async getAll(): Promise<CRUDReturn> {
+    var results: Array<any> = [];
+    try {
+      var allUsers = await this.getAllUserObjects();
+      allUsers.forEach((user) => {
+        results.push(user.toJson(true));
+      });
+      return { success: true, data: results };
+    } catch (e) {
+      return { success: false, data: e };
+    }
+  }
+
+  async getAllUserObjects(): Promise<Array<User>> {
+    var results: Array<User> = [];
+    try {
+      var dbData: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData> =
+        await this.DB.collection("users").get();
+      dbData.forEach((doc) => {
+        if (doc.exists) {
+          var data = doc.data();
+          results.push(
+            new User(
+              data["name"],
+              data["age"],
+              data["email"],
+              data["password"],
+              doc.id
+            )
+          );
+        }
+      });
+      return results;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  async searchUser(term: string): Promise<CRUDReturn> {
+    try {
+      var results: Array<any> = [];
+      var users: Array<User> = await this.getAllUserObjects();
+      for (const user of users.values()) {
+        if (user.matches(term)) results.push(user.toJson());
+      }
+      return { success: results.length > 0, data: results };
+    } catch (error) {
+      console.log(error.message);
+      return { success: false, data: error.message, };
+    }
+  }
+
+  async replaceValuePut(id: string, body: any): Promise<CRUDReturn> {
+    try {
+      var user: User = await User.retrieve(id);
+      if (user != null) {
+        var validBodyPut: { valid: boolean; data: string } =
+          Helper.validBodyPut(body);
+        if (validBodyPut.valid) {
+          var exists = await this.emailExists(body.email, { exceptionId: id });
+          if (!exists) {
+            var success = user.replaceValues(body);
+            await user.commit(false);
+            if (success)
+              return {
+                success: success,
+                data: user.toJson(),
+              };
+            else {
+              throw new Error("Failed to update user in db");
+            }
+          } else {
+            throw new Error(`${body.email} is already in use by another user!`);
+          }
+        } else {
+          throw new Error(validBodyPut.data);
+        }
+      } else {
+        throw new Error(`User ${id} is not in database`);
+      }
+    } catch (error) {
+      console.log("PutError");
+      console.log(error.message);
+      return {
+        success: false,
+        data: error.message,
+      };
+    }
+  }
+
+  async replaceValuePatch(id: string, body: any): Promise<CRUDReturn> {
+    try {
+      var user: User = await User.retrieve(id);
+      if (user != null) {
+        var validBodyPatch: { valid: boolean; data: string } =
+          Helper.validBody(body);
+        if (validBodyPatch.valid) {
+          if (body.email != undefined) {
+            var exists = await this.emailExists(body.email, {
+              exceptionId: id,
+            });
+            if (exists) {
+              throw new Error(
+                `${body.email} is already in use by another user!`
+              );
+            }
+          }
+          var success = user.replaceValues(body);
+          console.log(user.toJson(false));
+          await user.commit(false);
+          if (success) {
+            return {
+              success: success,
+              data: user.toJson(),
+            };
+          } else {
+            throw new Error("Failed to update user");
+          }
+        } else {
+          throw new Error(validBodyPatch.data);
+        }
+      } else {
+        throw new Error(`User ${id} is not in database`);
+      }
+    } catch (error) {
+      console.log("PatchError");
+      console.log(error.message);
+      return {
+        success: false,
+        data: error.message,
+      };
+    }
+  }
+
+  async deleteUser(id: string): Promise<CRUDReturn> {
+    try {
+      var user: User = await User.retrieve(id);
+      if (user != null) {
+        var success: boolean = await user.delete();
+        return {
+          success: success,
+          data: `User ${id} has been successfully removed`,
+        };
+      } else
+        return {
+          success: false,
+          data: `User ${id} is not in database`,
+        };
+    } catch (error) {
+      console.log("DeleteError");
+      console.log(error.message);
+      return {
+        success: false,
+        data: error.message,
+      };
+    }
+  }
+
+  async login(email: string, password: string): Promise<CRUDReturn> {
+    try {
+      var user: User = await User.retrieveViaEmail(email);
+      if (user != null) {
+        return user.login(password);
+      } else {
+        return { success: false, data: `${email} not found in database` };
+      }
+    } catch (error) {
+      console.log("Login error");
+      console.log(error.message);
+      return { success: false, data: error.message, };
+    }
+  }
+
+  //secondary functions
+  async emailExists(
+    email: string,
+    options?: { exceptionId: string }
+  ): Promise<boolean> {
+    try {
+      var userResults = await this.DB.collection("users")
+        .where("email", "==", email)
+        .get();
+      console.log("Are the user results empty?");
+      console.log(userResults.empty);
+      if (userResults.empty) return false;
+      for (const doc of userResults.docs) {
+        console.log(doc.data());
+        console.log("Are the options defined?");
+        console.log(options != undefined);
+        if (options != undefined) {
+          if (doc.id == options?.exceptionId) continue;
+        }
+        if (doc.data()["email"] === email) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+      return false;
+    } catch (error) {
+      console.log("Email exists subfunction error");
+      console.log(error.message);
+      return false;
+    }
+  }
+
+  async saveToDB(user: User): Promise<boolean> {
+    console.log(`Attempting to save user ${user.id} ${user.email}`);
+    try {
+      var result = await user.commit(false);
+      return result.success;
+    } catch (error) {
+      console.log("Save to db error");
+      console.log(error.message);
+      return false;
+    }
+  }
+
+  async logAllUsers() {
+    console.log(await this.getAll());
+  }
 }

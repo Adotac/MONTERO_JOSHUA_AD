@@ -1,0 +1,28 @@
+<div class="b">
+
+    <div class="bgbox">
+        <img src="../assets/stunning suisei.jpg" alt="suisei-still_still_stellar">
+    </div>
+
+    <div class="login">
+        <form class="loginForm">
+            <h3 class="loginHeader">
+                Hoshiyomi<br>Observatory
+            </h3>
+
+            <label for="email">Email</label>
+            <input type="email" id="mail" name="EMAIL" [formControl]="fcEmail">
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="PASSWORD" [formControl]="fcPassword">
+            <p>{{reRes | json}}</p>
+            <!-- <input type="button" id="btnLogin" class="btn btn-primary" value="Submit"> -->
+            <button class="btnLogin" (click)="login()">Login</button>
+            <button class="btnRegister" (click)="nav('register')" ng-mouseover="changeColor()">
+                First time? Register here!
+            </button>
+        </form>
+
+    </div>
+
+</div>

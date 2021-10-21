@@ -1,0 +1,36 @@
+<div class="b">
+    <div class="bgbox">
+        <img src="../assets/stunning suisei.jpg" alt="suisei-still_still_stellar">
+    </div>
+    <div class="register">
+        <form class="regForm" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+            <h3 class="regHeader"> Hoshiyomi Form </h3>
+
+            <label for="NAME">Name</label>
+            <input type="text" id="mail" name="NAME" formControlName="fcName">
+
+            <label for="AGE">Age</label>
+            <input type="number" id="mail" name="AGE" formControlName="fcAge">
+
+            <label for="EMAIL">Email</label>
+            <input type="email" id="mail" name="EMAIL" formControlName="fcEmail">
+
+            <label for="PASWORD">Password</label>
+            <input type="password" id="password" name="PASSWORD" formControlName="fcPassword">
+
+            <label for="PASWORD_2">Confirm Password</label>
+            <input type="password" id="password" name="PASSWORD_2" formControlName="fcPassword2">
+            <p>{{ error }}</p>
+            <p>{{ registerForm.value | json}}</p>
+            <p>{{ registerForm.status }}</p>
+            <button type="submit" class="btn" [disabled]="!registerForm.valid">
+                CREATE ACCOUNT
+            </button>
+            <button class="btn" (click)="nav('login')" style="margin-bottom: 30px;">
+                BACK TO LOGIN
+            </button>
+        </form>
+
+    </div>
+
+</div>

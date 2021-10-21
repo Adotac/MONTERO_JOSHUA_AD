@@ -1,4 +1,5 @@
 {
     "rpc.enabled": true,
-    "rpc.appName": "Visual Studio Code"
+    "rpc.appName": "Visual Studio Code",
+    "vsicons.presets.angular": true
 }
