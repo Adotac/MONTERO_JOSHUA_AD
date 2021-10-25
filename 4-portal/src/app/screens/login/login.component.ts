@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
@@ -11,47 +11,38 @@ import { environment } from 'src/environments/environment';
 export class LoginComponent implements OnInit {
   constructor(private router: Router, private api: HttpClient) {}
 
-  ngOnInit(): void {}
-
-  fcEmail = new FormControl();
-  fcPassword = new FormControl();
-  reRes = '';
+  loginForm: FormGroup = new FormGroup({
+    fcEmail: new FormControl('', Validators.required),
+    fcPassword: new FormControl('', Validators.required),
+  });
   
-  async login() {
-    var result: any = await this.api
-    .get(environment.API_URL + "/user/all").toPromise();
+  ngOnInit(): void {}
+  
+  async onLogin() {
+    try{
+      var email = this.loginForm.value['fcEmail'];
+      var passw = this.loginForm.value['fcPassword'];
+      var result: any = await this.api.post(environment.API_URL + "/user/login", {
+        email: email,
+        password: passw 
+      }).toPromise();
 
-    // var result: any = await this.api
-    //   .post(environment.API_URL + "/user/login", {
-    //     email: this.fcEmail.value,
-    //     password: this.fcPassword.value,
-    //   })
-    //   .toPromise();
-
-    console.log(result);
-    // if(result.success){
-    //   //alert('Success');
-    //   this.nav('home');
-    // }
-    // else {
-    //   alert('Incorrect credentials');
-    //   console.log('Nagkakamali ka ng susi');
-    // }
-    // if (
-    //   this.fcEmail.value == 'admin@gmail.com' &&
-    //   this.fcPassword.value == '1234'
-    // ) {
-    //   this.nav('home');
-    // } else {
-    //   alert('Incorrect credentials');
-    //   console.log('Nagkakamali ka ng susi');
-    // }
+      if(result.success){
+        //alert('Success');
+        this.nav('home');
+      }
+      else {
+        alert('Incorrect credentials');
+        console.log('Nagkakamali ka ng susi');
+      }
+    }
+    catch(e){
+      console.log(e);
+      alert('HttpError, please try again...');
+      //console.log("WAY AYOOOOOOOO");
+    }
   }
   nav(destination: string) {
     this.router.navigate([destination]);
-  }
-
-  changeColor(){
-    
   }
 }

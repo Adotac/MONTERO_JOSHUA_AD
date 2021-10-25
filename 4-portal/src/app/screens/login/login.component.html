@@ -5,20 +5,19 @@
     </div>
 
     <div class="login">
-        <form class="loginForm">
+        <form class="loginForm" [formGroup]="loginForm" (ngSubmit)="onLogin()">
             <h3 class="loginHeader">
                 Hoshiyomi<br>Observatory
             </h3>
 
             <label for="email">Email</label>
-            <input type="email" id="mail" name="EMAIL" [formControl]="fcEmail">
+            <input type="email" id="mail" name="EMAIL" formControlName="fcEmail">
 
             <label for="password">Password</label>
-            <input type="password" id="password" name="PASSWORD" [formControl]="fcPassword">
-            <p>{{reRes | json}}</p>
+            <input type="password" id="password" name="PASSWORD" formControlName="fcPassword">
             <!-- <input type="button" id="btnLogin" class="btn btn-primary" value="Submit"> -->
-            <button class="btnLogin" (click)="login()">Login</button>
-            <button class="btnRegister" (click)="nav('register')" ng-mouseover="changeColor()">
+            <button type="submit" class="btnLogin" [disabled]="!loginForm.valid">Login</button>
+            <button class="btnRegister" (click)="nav('register')">
                 First time? Register here!
             </button>
         </form>

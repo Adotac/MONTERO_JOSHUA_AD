@@ -20,9 +20,10 @@
 
             <label for="PASWORD_2">Confirm Password</label>
             <input type="password" id="password" name="PASSWORD_2" formControlName="fcPassword2">
-            <p>{{ error }}</p>
-            <p>{{ registerForm.value | json}}</p>
-            <p>{{ registerForm.status }}</p>
+            <p style="color: red;">{{ error }}</p>
+            <span *ngIf="registerForm.controls['fcEmail'].hasError('pattern')" style="color: red;">Invalid email</span>
+            <!-- <p>{{ registerForm.value | json}}</p> -->
+            <!-- <p>{{ registerForm.status }}</p> -->
             <button type="submit" class="btn" [disabled]="!registerForm.valid">
                 CREATE ACCOUNT
             </button>
