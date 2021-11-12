@@ -1,124 +1,95 @@
-<div class="b">
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+            <a class="navbar-brand">Hoshiyomi Observatory</a>
+        </div>
 
-    <div class="bgbox">
-        <img src="../assets/stunning suisei.jpg" alt="suisei-still_still_stellar">
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="nav">
+            <ul>
+                <li> <button class="navlinkBtn" (click)="reset_DB()">Reset DB</button></li>
+
+            </ul>
+            <form class="navbar-form" [formGroup]="navForm">
+                <div class="form-group ">
+                    <input type="text " class="form-control " placeholder="Search " formControlName="fcSearch">
+                </div>
+            </form>
+
+            <ul>
+                <li>
+                    <button class="navlinkBtn" (click)="nav('login')" style="width: 110px;height: 20px;">
+                        <img src="../../../assets/cool avatar suisei.jpg" alt="suisei-avatar">    
+                        Logout
+                    </button>
+                </li>
+            </ul>
+
+        </div>
+
+        <!-- /.navbar-collapse -->
     </div>
-
-    <div class="mainBoard">
-        <aside class="sideBoard">
-            <img src="../../../assets/cool avatar suisei.jpg" alt="suisei-avatar">
-            <div class="userAPI">
-                <button class="sideBtn" id="homeBtn" (click)="apiButtons(1)">Home</button>
-                <button type="button" class="sideBtn" id="allBtn" (click)="apiButtons(2)">Display All Users</button>
-                <!-- Buttons that are not API ready yet are commented -->
-                <!-- <button class="sideBtn" id="editUserBtn" (click)="apiButtons(3)">Edit Profile</button> -->
-                <button class="sideBtn" id="searchBtn" (click)="apiButtons(4)">Search</button>
-                <!-- <button class="sideBtn" id="delBtn" (click)="apiButtons(5)">Delete Account</button> -->
-                <button class="sideBtn" id="delBtn" (click)="nav('login')">Logout</button>
+</nav>
 
 
-            </div>
-        </aside>
+<div class="b ">
 
-
-        <div class="mBoard-container">
-            <table *ngIf="getAll_Flag" class="user-table">
-                <tr>
-                    <th>Index</th>
-                    <th>User ID</th>
-                    <th>Name</th>
-                    <th>Age</th>
-                    <th>Email</th>
-                    <th>Controls</th>
-
+    <div class="mBoard-container">
+        <table md-table class="table table-striped ">
+            <thead md-head>
+                <tr md-row>
+                    <th md-column scope="col ">Index#</th>
+                    <th md-column scope="col ">Name</th>
+                    <th md-column scope="col ">Age</th>
+                    <th md-column scope="col ">Email</th>
+                    <th md-column scope="col ">Actions</th>
                 </tr>
-                <tr *ngFor="let user of userDB; let indexOfelement=index; ">
-                    <td>{{indexOfelement + 1}}</td>
-                    <td>{{user.id}}</td>
-                    <td>{{user.name}}</td>
-                    <td>{{user.age}}</td>
-                    <td>{{user.email}}</td>
-                    <td class="btnCol">
-                        <button class="btn btn-info" (click)="editUser(user)">Edit</button>
-                        <button class="btn btn-info" (click)="deleteUser(user.id)">Delete</button>
+            </thead>
+            <tbody md-body>
+                <tr md-row *ngFor="let user of userDB ; let indexOfelement=index; ">
+                    <th scope="row ">{{ indexOfelement + 1 }}</th>
+                    <td md-cell>{{user.name}}</td>
+                    <td md-cell>{{user.age}}</td>
+                    <td md-cell>{{user.email}}</td>
+                    <td md-cell class="btnActions">
+                        <button (click)="editUser(user)">Edit</button>
+                        <button (click)="deleteUser(user.id)">Delete</button>
                     </td>
+
                 </tr>
+            </tbody>
 
-            </table>
-
-            <div *ngIf="searchFlag" class="searchBoard">
-                <nav class="navbar navbar-inverse">
-                    <form class="navbar-form" [formGroup]="navForm" (ngSubmit)="onSearch()">
-                        <div class="form-group input-group navform-group">
-                            <input type="text" class="form-control" placeholder="Search.." formControlName="fcSearch">
-                            <span class="input-group-btn">
-                            <button type="submit" class="btn btn-default" [disabled]="!navForm.valid">
-                                <span class="glyphicon glyphicon-search"></span>
-                            </button>
-
-                            </span>
-
-
-                        </div>
-
-                    </form>
-                </nav>
-
-                <table class="user-table">
-                    <tr>
-                        <th>Index</th>
-                        <th>User ID</th>
-                        <th>Name</th>
-                        <th>Age</th>
-                        <th>Email</th>
-                        <th>Controls</th>
-
-                    </tr>
-                    <tr *ngFor="let user of searchDB; let indexOfelement=index; ">
-                        <td>{{indexOfelement + 1}}</td>
-                        <td>{{user.id}}</td>
-                        <td>{{user.name}}</td>
-                        <td>{{user.age}}</td>
-                        <td>{{user.email}}</td>
-                        <td class="btnCol">
-                            <button class="btn btn-info" (click)="editUser(user)">Edit</button>
-                            <button class="btn btn-info" (click)="deleteUser(user.id)">Delete</button>
-                        </td>
-                    </tr>
-
-                </table>
-
-            </div>
-        </div>
-
-        <div *ngIf="editPop_Flag" class="userEdit_Popup">
-            <div class="popup">
-                <h3>{{currentSelected_User.id}}</h3>
-
-                <form class="editForm" id="eForm" [formGroup]="editForm">
-                    <label for="NAME">Name</label>
-                    <input type="text" name="NAME" placeholder={{currentSelected_User.name}} formControlName="fcName">
-
-                    <label for="AGE">Age</label>
-                    <input type="number" name="AGE" placeholder={{currentSelected_User.age}} formControlName="fcAge">
-
-                    <label for="EMAIL">Email</label>
-                    <input type="email" id="mail" name="EMAIL" placeholder={{currentSelected_User.email}} formControlName="fcEmail">
-
-                    <label for="PASWORD">Password</label>
-                    <input type="password" id="password" name="PASSWORD" formControlName="fcPassword">
-
-
-                </form>
-                <button type="button" class="btn" (click)="applyEdit(currentSelected_User.id)">
-                    APPLY EDIT
-                </button>
-                <button class="btn btn-info" (click)="close_editUser()">Close</button>
-            </div>
-        </div>
-
-
+        </table>
     </div>
 
+    <!-- CUSTOM MODAL ALTERNATIVE -->
+    <div *ngIf="editPop_Flag" class="userEdit_Popup">
+        <div class="popup">
+            <form class="editForm" id="eForm" [formGroup]="editForm">
+                <label for="NAME">Name</label>
+                <input type="text" name="NAME" placeholder={{currentSelected_User.name}} formControlName="fcName">
+
+                <label for="AGE">Age</label>
+                <input type="number" name="AGE" placeholder={{currentSelected_User.age}} formControlName="fcAge">
+
+                <label for="EMAIL">Email</label>
+                <input type="email" id="mail" name="EMAIL" placeholder={{currentSelected_User.email}} formControlName="fcEmail">
+
+                <label for="PASWORD">Password</label>
+                <input type="password" id="password" name="PASSWORD" formControlName="fcPassword">
+
+
+            </form>
+            <button type="button" class="btn" (click)="applyEdit(currentSelected_User.id)">
+                APPLY EDIT
+            </button>
+            <button class="btn btn-info" (click)="close_editUser()">Close</button>
+        </div>
+    </div>
 
 </div>
+
+<footer>
+    <div>FOOTER!</div>
+</footer>

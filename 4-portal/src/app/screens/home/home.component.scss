@@ -1,22 +1,100 @@
+.navbar {
+    width: 100vw;
+    height: 5vh;
+    margin: 0%;
+    ul {
+        list-style-type: none;
+        li {
+            button {
+                display: flex;
+            }
+        }
+    }
+    .nav {
+        display: flex;
+        float: right;
+        width: 30%;
+        img {
+            margin: 5px 0px 5px 0px;
+            border-radius: 90px;
+            height: 40px;
+            width: 40px;
+        }
+    }
+    .navbar-brand {
+        padding: 15px;
+        height: inherit;
+    }
+    .navlinkBtn {
+        background: none;
+        border: none;
+        height: inherit;
+        padding: 15px;
+        width: 70px;
+        font-size: 16px;
+        line-height: 20px;
+        justify-content: center;
+        align-items: center;
+    }
+    .navlinkBtn:hover {
+        background-color: grey;
+    }
+    .container-fluid {
+        height: inherit;
+        width: inherit;
+    }
+    .navbar-form {
+        width: 40%;
+        padding: 0% 30px 0% 30px;
+        .form-group {
+            width: 100%;
+            .form-control {
+                height: 20px;
+                width: inherit;
+            }
+        }
+    }
+}
+
 .b {
     height: 100vh;
     width: 100vw;
     margin: 0px;
     padding: 0px;
     display: flex;
-    flex-direction: row;
-    // background-image: url("../../../assets/stunning\ suisei.jpg");
     background-origin: border-box;
-    justify-content: center;
+    flex-direction: row;
     align-items: center;
-    .bgbox {
-        position: absolute;
-        overflow: hidden;
-        display: block;
-        height: 100%;
-        width: 100%;
-        padding: 0;
-        filter: blur(2px);
+    justify-content: center;
+    .mBoard-container {
+        background-color: rgb(238, 238, 238);
+        margin: 0px 50px;
+        height: 85%;
+        width: 75%;
+        .table {
+            display: table;
+            height: fit-content;
+            width: 100%;
+            tr {
+                line-height: 40px;
+                th {
+                    height: inherit;
+                    text-align: center;
+                }
+                // td.btnActions {
+                //     position: relative;
+                // }
+                td {
+                    width: 100%;
+                    text-align: center;
+                    button {
+                        width: 60px;
+                        height: 20px;
+                        margin: 0px 10px;
+                    }
+                }
+            }
+        }
     }
     .userEdit_Popup {
         z-index: 90;
@@ -31,7 +109,7 @@
             background-color: white;
             display: flex;
             height: 60vh;
-            width: 20vw;
+            width: 30vw;
             margin: 0px;
             padding: 50px;
             border-radius: 5px;
@@ -71,139 +149,8 @@
     }
 }
 
-.mainBoard {
-    background-color: rgb(25, 84, 133);
-    display: flex;
-    height: 80vh;
-    width: 80vw;
-    margin: 0px;
-    border-radius: 5px;
-    overflow: hidden;
-    z-index: 3;
-    flex-direction: row;
-    align-items: center;
-    justify-content: center;
-    .sideBoard {
-        height: 100%;
-        width: 20%;
-        background-color: azure;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        img {
-            margin: 20px 0px;
-            border-radius: 90px;
-            height: 150px;
-            width: 150px;
-        }
-        .userAPI {
-            width: 80%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            .sideBtn {
-                background-color: #04AA6D;
-                border: 1px solid green;
-                color: white;
-                padding: 10px 0px;
-                cursor: pointer;
-                width: 100%;
-                display: block;
-            }
-            .sideBtn:not(:last-child) {
-                border-bottom: none;
-            }
-            .sideBtn:hover {
-                background-color: #3fb8a3;
-            }
-        }
-    }
-    .mBoard-container {
-        background-color: white;
-        margin: 0px 50px;
-        height: 85%;
-        width: 75%;
-        display: grid;
-        align-self: center;
-        .user-table {
-            display: table;
-            height: fit-content;
-            tr {
-                line-height: 40px;
-                background-color: rgb(65, 139, 199);
-                th {
-                    height: inherit;
-                    border: 2px solid rgb(141, 137, 137);
-                    text-align: center;
-                }
-                td.btnCol {
-                    display: flex;
-                    flex-direction: row;
-                    align-items: center;
-                    justify-content: center;
-                    .btn {
-                        display: inline-flex;
-                        margin: 0px 10px;
-                    }
-                }
-            }
-        }
-        .searchBoard {
-            background-color: grey;
-            width: 100%;
-            height: 100%;
-            .user-table {
-                display: table;
-                position: flex;
-                flex-direction: column;
-                height: fit-content;
-                width: 100%;
-                tr {
-                    line-height: 40px;
-                    background-color: rgb(65, 139, 199);
-                    th {
-                        height: inherit;
-                        border: 2px solid rgb(141, 137, 137);
-                        text-align: center;
-                    }
-                    td.btnCol {
-                        display: flex;
-                        flex-direction: row;
-                        align-items: center;
-                        justify-content: center;
-                        .btn {
-                            display: inline-flex;
-                            margin: 0px 10px;
-                        }
-                    }
-                }
-            }
-            .navbar {
-                background-color: rgb(0, 0, 0);
-                height: 5%;
-                width: 100%;
-                position: flex;
-                border-radius: 0%;
-                .navbar-form {
-                    display: flex;
-                    flex-direction: row;
-                    width: 80%;
-                    height: inherit;
-                    padding: 0px 10%;
-                    .navform-group {
-                        width: 100%;
-                        display: inline-flex;
-                        justify-self: center;
-                        .input-group-btn {
-                            position: relative;
-                            height: fit-content;
-                        }
-                        .form-control {
-                            height: fit-content;
-                        }
-                    }
-                }
-            }
-        }
-    }
+footer {
+    padding: 42px 24px;
+    text-align: center;
+    background-color: #ebf5ff;
 }

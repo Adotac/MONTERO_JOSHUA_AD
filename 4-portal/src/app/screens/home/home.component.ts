@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnChanges, OnInit, SimpleChanges, ChangeDetectionStrategy } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+
+import { from, asyncScheduler } from 'rxjs';
 
 @Component({
   selector: 'app-home', 
@@ -11,8 +13,11 @@ import { environment } from 'src/environments/environment';
 
 })
 export class HomeComponent implements OnInit {
+  
+  constructor(private router: Router, private api: HttpClient) {
+  }
 
-  constructor(private router: Router, private api: HttpClient) {}
+  filter = new FormControl('');
 
   navForm: FormGroup = new FormGroup({
     fcSearch: new FormControl('', Validators.required),
@@ -24,39 +29,55 @@ export class HomeComponent implements OnInit {
     fcEmail: new FormControl('',Validators.pattern('^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+$')),
     fcPassword: new FormControl(''),
   });
-
-  getAll_Flag: boolean = false;
-  editProfile_Flag: boolean = false;
-  searchFlag:boolean = false;
-  userDB: any; searchDB:any;
+  
+  userDB:any; 
+  
   currentSelected_User: any;
   
 
   ngOnInit(): void {
     this.getAllUsers();
+
+    this.onChanges();
+  }
+  onChanges(): void{
+    this.navForm.valueChanges.subscribe(term =>{
+      console.log(term.fcSearch)
+      if(term.fcSearch == ''){
+        this.getAllUsers();
+      }            
+      else{
+        this.onSearch();
+      }
+    })
   }
 
   test(c:any){
     alert(c);
   }
+
+
   async onSearch(){
-    var result: any = await this.api.get(environment.API_URL + "/user/search/"+
+    var result: any =  await this.api.get(environment.API_URL + "/user/search/"+ 
     this.navForm.value['fcSearch']).toPromise();
-    this.searchDB = result.data;
-    console.log(this.navForm.value['fcSearch'] + result.success);
+    //console.log(result.data);
+    
+    this.userDB = result.data;
+    //console.log(this.navForm.value['fcSearch'] + result.success);
   }
 
   async getAllUsers(){
     var result: any = await this.api.get(environment.API_URL + "/user/all").toPromise();
     this.userDB = result.data;
+    //this.test("DISPLAYING ALL USERS");
   }
 
 
   //////EDIT USER FROM TABLE ALL////////
   editPop_Flag:boolean = false;
   editUser(user:any){
-    this.currentSelected_User = user;
     this.editPop_Flag = true;
+    this.currentSelected_User = user;
   }
   close_editUser(){
     this.currentSelected_User = null;
@@ -86,7 +107,6 @@ export class HomeComponent implements OnInit {
       console.log("password = " + result.success);
     }
     window.location.reload();
-    document.getElementById('allBtn')?.click();
     this.editForm.reset({fcName:'',fcAge:'',fcEmail:'',fcPassword:''});
   }
 //////////////////
@@ -95,37 +115,13 @@ export class HomeComponent implements OnInit {
     console.log("delete = " + result.success);
     window.location.reload();
   }
-
-  apiButtons(index:number){
-    switch(index){
-      case 1:
-        this.getAll_Flag = false;
-        this.editProfile_Flag = false;
-        this.searchFlag = false;
-        break;
-      case 2:
-        this.getAll_Flag = true;
-        this.editProfile_Flag = false;
-        this.searchFlag = false;
-        break;
-      case 3:
-        this.getAll_Flag = false;
-        this.editProfile_Flag = true;
-        this.searchFlag = false;
-        break;
-      case 4:
-        this.getAll_Flag = false;
-        this.editProfile_Flag = false;
-        this.searchFlag = true;
-        break;
-      case 5:
-        //Delete Function
-        break;
-          
-
-    }
+  async reset_DB(){
+    var result: any = await this.api.patch(environment.API_URL + "/user/reset",{}).toPromise();
+    window.location.reload();
   }
+
   nav(destination: string) {
     this.router.navigate([destination]);
   }
 }
+

@@ -135,7 +135,11 @@ export class User {
     var keys: Array<string> = Helper.describeClass(User);
     keys = Helper.removeItemOnce(keys, "password");
     for (const key of keys) {
-      if (`${this[key]}` === term) return true;
+      var t:string = this[key];
+      //console.log(t)
+      //if (t.toString().toLowerCase() === term.toString().toLowerCase()) return true;
+
+      if (t.toString().toLowerCase().includes( term.toString().toLowerCase())  ) return true;
     }
     return false;
   }
